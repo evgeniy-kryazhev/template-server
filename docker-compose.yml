@@ -1,0 +1,88 @@
+version: '3.9'
+
+services:
+  nginx-proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - '81:81'
+      - '443:443'
+    volumes:
+      - /excijin-cloud/nginx-proxy:/data
+      - /excijin-cloud/letsencrypt:/etc/letsencrypt
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /excijin-cloud/portainer:/data
+    ports:
+      - 9000:9000
+    labels:
+      - homepage.group=Development
+      - homepage.name=Portainer
+      - homepage.icon=portainer.png
+      - homepage.href=http://77.232.139.240:9000/
+      - homepage.description=Docker Manager
+
+  gitea:
+    image: gitea/gitea:1.19.3
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=gitea-db:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD=gitea
+    restart: always
+    volumes:
+      - /excijin-cloud/gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3001:3000"
+      - "222:22"
+    depends_on:
+      - gitea-db
+    labels:
+      - homepage.group=Development
+      - homepage.name=Gitea
+      - homepage.icon=gitea.png
+      - homepage.href=http://77.232.139.240:3001/
+      - homepage.description=Git hosting service
+
+  gitea-db:
+    image: postgres:14
+    container_name: gitea-db
+    restart: always
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    volumes:
+      - /excijin-cloud/gitea/postgres:/var/lib/postgresql/data
+
+  homepage:
+    image: ghcr.io/benphelps/homepage:latest
+    container_name: homepage
+    ports:
+      - 3000:3000
+    volumes:
+      - /excijin-cloud/homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on: 
+       - portainer
+       - gitea
+
+networks:
+  default:
+    external: true
+    name: excijin-cloud

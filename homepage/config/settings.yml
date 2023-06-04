@@ -1,0 +1,25 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/en/configs/settings
+
+title: Dashborad
+background: 
+  image: https://images.unsplash.com/photo-1502790671504-542ad42d5189?auto=format&fit=crop&w=2560&q=80
+  blur: sm
+
+theme: dark
+
+headerStyle: boxed
+
+language: ru
+hideVersion: true
+showStats: true
+
+layout:
+  Development:
+    style: row
+    columns: 2
+
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
