@@ -1,0 +1,14 @@
+services: "3"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+     - PMA_ARBITRARY=1
+     - PMA_HOST=mysql
+    restart: always
+    ports:
+     - 8081:80
+    networks:
+     - databases
+    volumes:
+      - /root/themes/phpmyadmin/theme/:/www/themes/theme/
